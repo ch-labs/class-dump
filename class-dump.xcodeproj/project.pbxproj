@@ -17,6 +17,7 @@
 				01B02D3313A5B5E20047BC53 /* PBXTargetDependency */,
 				01B02D3513A5B5E20047BC53 /* PBXTargetDependency */,
 				01B02D3913A5B5E20047BC53 /* PBXTargetDependency */,
+				DA772C9013AC0825002FAB67 /* PBXTargetDependency */,
 			);
 			name = all;
 			productName = all;
@@ -111,6 +112,10 @@
 		01B02D3A13A5B72B0047BC53 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 013D1F0B13A5ADC300BF0A67 /* libcrypto.dylib */; };
 		01EB826413A590D9003EDE60 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01EB826313A590D9003EDE60 /* Foundation.framework */; };
 		DA7533B213AA587A003BE32C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01EB826313A590D9003EDE60 /* Foundation.framework */; };
+		DA772C7913AC07B9002FAB67 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 013D1F0B13A5ADC300BF0A67 /* libcrypto.dylib */; };
+		DA772C7A13AC07B9002FAB67 /* libMachObjC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 013D1F1113A5AE5A00BF0A67 /* libMachObjC.a */; };
+		DA772C7B13AC07B9002FAB67 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01EB826313A590D9003EDE60 /* Foundation.framework */; };
+		DA772C8C13AC0812002FAB67 /* whatlib.m in Sources */ = {isa = PBXBuildFile; fileRef = DA772C8B13AC0812002FAB67 /* whatlib.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +146,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 01B02CFE13A5B0DC0047BC53;
 			remoteInfo = formatType;
+		};
+		DA772C8F13AC0825002FAB67 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 01EB825613A590D9003EDE60 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA772C7513AC07B9002FAB67;
+			remoteInfo = whatlib;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -338,6 +350,9 @@
 		01EB831F13A591D8003EDE60 /* CDVisitorPropertyState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDVisitorPropertyState.h; sourceTree = SOURCE_ROOT; };
 		01EB832013A591D8003EDE60 /* CDVisitorPropertyState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDVisitorPropertyState.m; sourceTree = SOURCE_ROOT; };
 		01EB836813A5933F003EDE60 /* dyld-info-compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "dyld-info-compat.h"; sourceTree = SOURCE_ROOT; };
+		DA09416D13AC08A000ACE2E8 /* whatlib-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "whatlib-Prefix.pch"; sourceTree = "<group>"; };
+		DA772C8013AC07B9002FAB67 /* whatlib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = whatlib; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA772C8B13AC0812002FAB67 /* whatlib.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = whatlib.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -380,6 +395,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DA772C7813AC07B9002FAB67 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA772C7913AC07B9002FAB67 /* libcrypto.dylib in Frameworks */,
+				DA772C7A13AC07B9002FAB67 /* libMachObjC.a in Frameworks */,
+				DA772C7B13AC07B9002FAB67 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -414,6 +439,7 @@
 				01EB826513A590D9003EDE60 /* class-dump */,
 				013D1EFE13A5A0F100BF0A67 /* deprotect */,
 				01B02D0213A5B0DC0047BC53 /* formatType */,
+				DA772C8313AC07DB002FAB67 /* whatlib */,
 				01EB826213A590D9003EDE60 /* Frameworks */,
 				01EB826013A590D9003EDE60 /* Products */,
 			);
@@ -426,6 +452,7 @@
 				013D1EFB13A5A0F100BF0A67 /* deprotect */,
 				013D1F1113A5AE5A00BF0A67 /* libMachObjC.a */,
 				01B02CFF13A5B0DC0047BC53 /* formatType */,
+				DA772C8013AC07B9002FAB67 /* whatlib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -652,6 +679,18 @@
 			name = "Type Parsing/Lexing";
 			sourceTree = "<group>";
 		};
+		DA772C8313AC07DB002FAB67 /* whatlib */ = {
+			isa = PBXGroup;
+			children = (
+				DA09416D13AC08A000ACE2E8 /* whatlib-Prefix.pch */,
+				DA772C8B13AC0812002FAB67 /* whatlib.m */,
+			);
+			indentWidth = 4;
+			name = whatlib;
+			sourceTree = "<group>";
+			tabWidth = 4;
+			usesTabs = 0;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -733,6 +772,22 @@
 			productReference = 01EB825F13A590D9003EDE60 /* class-dump */;
 			productType = "com.apple.product-type.tool";
 		};
+		DA772C7513AC07B9002FAB67 /* whatlib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA772C7D13AC07B9002FAB67 /* Build configuration list for PBXNativeTarget "whatlib" */;
+			buildPhases = (
+				DA772C7613AC07B9002FAB67 /* Sources */,
+				DA772C7813AC07B9002FAB67 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = whatlib;
+			productName = whatlib;
+			productReference = DA772C8013AC07B9002FAB67 /* whatlib */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -755,6 +810,7 @@
 				01EB825E13A590D9003EDE60 /* class-dump */,
 				013D1EFA13A5A0F100BF0A67 /* deprotect */,
 				01B02CFE13A5B0DC0047BC53 /* formatType */,
+				DA772C7513AC07B9002FAB67 /* whatlib */,
 			);
 		};
 /* End PBXProject section */
@@ -864,6 +920,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DA772C7613AC07B9002FAB67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA772C8C13AC0812002FAB67 /* whatlib.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -886,6 +950,11 @@
 			isa = PBXTargetDependency;
 			target = 01B02CFE13A5B0DC0047BC53 /* formatType */;
 			targetProxy = 01B02D3813A5B5E20047BC53 /* PBXContainerItemProxy */;
+		};
+		DA772C9013AC0825002FAB67 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA772C7513AC07B9002FAB67 /* whatlib */;
+			targetProxy = DA772C8F13AC0825002FAB67 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1051,6 +1120,32 @@
 			};
 			name = Release;
 		};
+		DA772C7E13AC07B9002FAB67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "whatlib-Prefix.pch";
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		DA772C7F13AC07B9002FAB67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "whatlib-Prefix.pch";
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1104,6 +1199,15 @@
 			buildConfigurations = (
 				01EB826F13A590D9003EDE60 /* Debug */,
 				01EB827013A590D9003EDE60 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA772C7D13AC07B9002FAB67 /* Build configuration list for PBXNativeTarget "whatlib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA772C7E13AC07B9002FAB67 /* Debug */,
+				DA772C7F13AC07B9002FAB67 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
