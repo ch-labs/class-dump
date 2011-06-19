@@ -52,9 +52,7 @@ void searchDylib(NSString *dylibPath)
         return;
     
     CDMachOFile *machOFile = [file machOFileWithArch:(CDArchFromName(@"x86_64"))];
-    
-    CDObjectiveCProcessor *processor = [[[[machOFile processorClass] alloc] initWithMachOFile:machOFile] autorelease];
-    [processor process];
+    [[machOFile symbolTable] loadSymbols];
     
     NSArray *symbols = [[machOFile symbolTable] symbols];
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(name == %@ OR name == %@ OR name == %@ OR name == %@) AND isInSection == TRUE", symbolName, underscoreSymbolName, classNameNew, classNameOld];
