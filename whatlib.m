@@ -19,10 +19,11 @@ static NSString *underscoreSymbolName = nil;
 static NSString *classNameNew = nil;
 static NSString *classNameOld = nil;
 
-void searchDylib(NSString *dylibPath)
+BOOL searchDylib(NSString *dylibPath)
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
+    BOOL symbolFound = NO;
     BOOL isFramework = [[dylibPath pathExtension] isEqualToString:@"framework"];
     if (isFramework)
     {
@@ -37,19 +38,19 @@ void searchDylib(NSString *dylibPath)
             for (NSString *sublib in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:frameworksPath error:NULL])
             {
                 NSString *sublibPath = [frameworksPath stringByAppendingPathComponent:sublib];
-                searchDylib(sublibPath);
+                symbolFound |= searchDylib(sublibPath);
             }
         }
     }
     
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:dylibPath error:NULL];
     if (!isFramework && ![[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeRegular])
-        return;
+        return symbolFound;
     
     NSData *dylibData = [NSData dataWithContentsOfMappedFile:dylibPath];
     CDFile *file = [CDFile fileWithData:dylibData filename:dylibPath searchPathState:nil];
     if (file == nil)
-        return;
+        return symbolFound;
     
     CDMachOFile *machOFile = [file machOFileWithArch:(CDArchFromName(@"x86_64"))];
     [[machOFile symbolTable] loadSymbols];
@@ -58,9 +59,13 @@ void searchDylib(NSString *dylibPath)
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(name == %@ OR name == %@ OR name == %@ OR name == %@) AND isInSection == TRUE", symbolName, underscoreSymbolName, classNameNew, classNameOld];
     CDSymbol *symbol = [[symbols filteredArrayUsingPredicate:predicate] lastObject];
     if (symbol)
+    {
         printf("%s: %s\n", [[symbol name] UTF8String], [dylibPath UTF8String]);
+        symbolFound = YES;
+    }
     
     [pool drain];
+    return symbolFound;
 }
 
 int main(int argc, char *argv[])
@@ -70,6 +75,7 @@ int main(int argc, char *argv[])
     if (argc != 2)
         return EXIT_FAILURE;
     
+    BOOL symbolFound = NO;
     NSString *sdkRoot = @"/Developer/SDKs/MacOSX10.6.sdk";
     symbolName = [NSString stringWithUTF8String:argv[1]];
     underscoreSymbolName = [@"_" stringByAppendingString:symbolName];
@@ -85,11 +91,11 @@ int main(int argc, char *argv[])
         for (NSString *dylib in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dylibRoot error:NULL])
         {
             NSString *dylibPath = [dylibRoot stringByAppendingPathComponent:dylib];
-            searchDylib(dylibPath);
+            symbolFound |= searchDylib(dylibPath);
         }
     }
     
     [pool drain];
     
-    return EXIT_SUCCESS;
+    return symbolFound ? 0 : 2;
 }
