@@ -36,6 +36,7 @@ void print_usage(void)
             "        -C <regex>     only display classes matching regular expression\n"
             "        -f <str>       find string in method name\n"
             "        -H             generate header files in current directory, or directory specified with -o\n"
+            "        -d             generate Graphviz dot file dependency graph\n"
             "        -I             sort classes, categories, and protocols by inheritance (overrides -s)\n"
             "        -o <dir>       output directory used for -H\n"
             "        -r             recursively expand frameworks and fixed VM shared libraries\n"
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
     BOOL shouldFind = NO;
     NSString *searchString = nil;
     BOOL shouldGenerateSeparateHeaders = NO;
+    BOOL shouldGenerateDotFile = NO;
     BOOL shouldListArches = NO;
     BOOL shouldPrintVersion = NO;
     CDArch targetArch;
@@ -79,6 +81,7 @@ int main(int argc, char *argv[])
         { "match",                   required_argument, NULL, 'C' },
         { "find",                    required_argument, NULL, 'f' },
         { "generate-multiple-files", no_argument,       NULL, 'H' },
+        { "dot",                     no_argument,       NULL, 'd' },
         { "sort-by-inheritance",     no_argument,       NULL, 'I' },
         { "output-dir",              required_argument, NULL, 'o' },
         { "recursive",               no_argument,       NULL, 'r' },
@@ -101,9 +104,10 @@ int main(int argc, char *argv[])
 
     CDClassDump *classDump = [[[CDClassDump alloc] init] autorelease];
     CDMultiFileVisitor *multiFileVisitor = [[[CDMultiFileVisitor alloc] init] autorelease];
+    id dotVisitor = nil;
     multiFileVisitor.classDump = classDump;
 
-    while ( (ch = getopt_long(argc, argv, "aAC:f:HIo:rRsSt", longopts, NULL)) != -1) {
+    while ( (ch = getopt_long(argc, argv, "aAC:f:HdIo:rRsSt", longopts, NULL)) != -1) {
         switch (ch) {
             case CD_OPT_ARCH: {
                 NSString *name = [NSString stringWithUTF8String:optarg];
@@ -179,6 +183,10 @@ int main(int argc, char *argv[])
                 
             case 'H':
                 shouldGenerateSeparateHeaders = YES;
+                break;
+                
+            case 'd':
+                shouldGenerateDotFile = YES;
                 break;
                 
             case 'I':
@@ -320,6 +328,8 @@ int main(int argc, char *argv[])
                     [visitor release];
                 } else if (shouldGenerateSeparateHeaders) {
                     [classDump recursivelyVisit:multiFileVisitor];
+                } else if (shouldGenerateDotFile) {
+                    [classDump recursivelyVisit:dotVisitor];
                 } else {
                     CDClassDumpVisitor *visitor = [[CDClassDumpVisitor alloc] init];
                     visitor.classDump = classDump;
