@@ -27,6 +27,7 @@ Usage
             -C <regex>     only display classes matching regular expression
             -f <str>       find string in method name
             -H             generate header files in current directory, or directory specified with -o
+            -d             generate Graphviz dot file dependency graph
             -I             sort classes, categories, and protocols by inheritance (overrides -s)
             -o <dir>       output directory used for -H
             -r             recursively expand frameworks and fixed VM shared libraries
