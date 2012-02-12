@@ -10,6 +10,23 @@
 #import "CDType.h"
 #import "CDTypeName.h"
 
+// Copied from https://github.com/Ahruman/ClassCrawler/blob/master/ClassCrawler.m
+static NSString *PseudoRandomColor(const char *key, uint8_t max)
+{
+    uint32_t hash = 5387;
+    while (*key)
+    {
+        hash = ((hash << 5) + hash) /* 33 * hash */ ^ *key;
+        key++;
+    }
+    
+    uint8_t red = ((hash * 7829) & 0xFF) * max / 255;
+    uint8_t green = ((hash * 2663) & 0xFF) * max / 255;
+    uint8_t blue = (hash & 0xFF) * max / 255;
+    
+    return [NSString stringWithFormat:@"#%.2X%.2X%.2X", red, green, blue];
+}
+
 @implementation CDDotVisitor
 
 - (id)init;
@@ -56,7 +73,8 @@
         for (CDOCIvar *ivar in class.ivars) {
             if ([classNames containsObject:ivar.parsedType.typeName.name]) {
                 [referencedClassNames addObject:class.name];
-                [digraph appendFormat:@"%@:%u -> %@\n", class.name, ivar.offset, ivar.parsedType.typeName.name];
+                NSString *key = [NSString stringWithFormat:@"%@:%u", class.name, ivar.offset];
+                [digraph appendFormat:@"%@ -> %@ [ color = \"%@\" ]\n", key, ivar.parsedType.typeName.name, PseudoRandomColor([key UTF8String], 200)];
             }
         }
     }
