@@ -49,14 +49,14 @@
     
     NSMutableString *digraph = [[[NSMutableString alloc] init] autorelease];
     [digraph appendString:@"digraph Dependencies {\n"
-                          @"graph [ rankdir = \"LR\" ];\n"
+                          @"graph [ rankdir = LR ];\n"
                           @"node [ shape = record ]\n"];
     
     for (CDOCClass *class in allClasses) {
         for (CDOCIvar *ivar in class.ivars) {
             if ([classNames containsObject:ivar.parsedType.typeName.name]) {
                 [referencedClassNames addObject:class.name];
-                [digraph appendFormat:@"\"%@\":%u -> \"%@\"\n", class.name, ivar.offset, ivar.parsedType.typeName.name];
+                [digraph appendFormat:@"%@:%u -> %@\n", class.name, ivar.offset, ivar.parsedType.typeName.name];
             }
         }
     }
