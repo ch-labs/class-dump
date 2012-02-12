@@ -8,6 +8,7 @@
 @interface CDDotVisitor : CDVisitor
 {
     NSMutableSet *allClasses;
+    NSMutableSet *referencedClassNames;
     NSMutableSet *allProtocols;
 }
 

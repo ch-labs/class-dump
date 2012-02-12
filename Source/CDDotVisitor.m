@@ -16,6 +16,7 @@
 {
     if ((self = [super init])) {
         allClasses = [[NSMutableSet alloc] init];
+        referencedClassNames = [[NSMutableSet alloc] init];
         allProtocols = [[NSMutableSet alloc] init];
     }
     
@@ -25,6 +26,7 @@
 - (void)dealloc;
 {
     [allClasses release];
+    [referencedClassNames release];
     [allProtocols release];
     
     [super dealloc];
@@ -51,6 +53,18 @@
                           @"node [ shape = record ]\n"];
     
     for (CDOCClass *class in allClasses) {
+        for (CDOCIvar *ivar in class.ivars) {
+            if ([classNames containsObject:ivar.parsedType.typeName.name]) {
+                [referencedClassNames addObject:class.name];
+                [digraph appendFormat:@"\"%@\":%u -> \"%@\"\n", class.name, ivar.offset, ivar.parsedType.typeName.name];
+            }
+        }
+    }
+    
+    for (CDOCClass *class in allClasses) {
+        if (![referencedClassNames containsObject:class.name])
+            continue;
+        
         [digraph appendFormat:@"%@ [ label = \"%@", class.name, class.name];
         for (CDOCIvar *ivar in class.ivars) {
             NSString *protocolName = nil;
@@ -62,11 +76,6 @@
                 [digraph appendFormat:@" | <%u> %@", ivar.offset, ivar.name];
         }    
         [digraph appendString:@"\" ]\n"];
-        
-        for (CDOCIvar *ivar in class.ivars) {
-            if ([classNames containsObject:ivar.parsedType.typeName.name])
-                [digraph appendFormat:@"\"%@\":%u -> \"%@\"\n", class.name, ivar.offset, ivar.parsedType.typeName.name];
-        }
     }
     
     [digraph appendString:@"}\n"];
