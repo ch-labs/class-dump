@@ -49,7 +49,7 @@
     
     NSMutableString *digraph = [[[NSMutableString alloc] init] autorelease];
     [digraph appendString:@"digraph Dependencies {\n"
-                          @"graph [ rankdir = LR ];\n"
+                          @"graph [ rankdir = LR ]\n"
                           @"node [ shape = record ]\n"];
     
     for (CDOCClass *class in allClasses) {
