@@ -74,8 +74,12 @@
             
             if ([classNames containsObject:ivar.parsedType.typeName.name] || [protocolNames containsObject:protocolName])
                 [digraph appendFormat:@" | <%u> %@", ivar.offset, ivar.name];
-        }    
+        }
         [digraph appendString:@"\" ]\n"];
+        
+        BOOL isRootClass = [class.superClassName isEqualToString:@"NSObject"] || [class.superClassName isEqualToString:@"NSProxy"];
+        if (!isRootClass)
+            [digraph appendFormat:@"%@ -> %@ [ style = dotted ]\n", class.name, class.superClassName];
     }
     
     [digraph appendString:@"}\n"];
