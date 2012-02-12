@@ -17,6 +17,7 @@
 #import "CDFindMethodVisitor.h"
 #import "CDClassDumpVisitor.h"
 #import "CDMultiFileVisitor.h"
+#import "CDDotVisitor.h"
 #import "CDFile.h"
 #import "CDMachOFile.h"
 #import "CDFatFile.h"
@@ -104,8 +105,9 @@ int main(int argc, char *argv[])
 
     CDClassDump *classDump = [[[CDClassDump alloc] init] autorelease];
     CDMultiFileVisitor *multiFileVisitor = [[[CDMultiFileVisitor alloc] init] autorelease];
-    id dotVisitor = nil;
+    CDDotVisitor *dotVisitor = [[[CDDotVisitor alloc] init] autorelease];
     multiFileVisitor.classDump = classDump;
+    dotVisitor.classDump = classDump;
 
     while ( (ch = getopt_long(argc, argv, "aAC:f:HdIo:rRsSt", longopts, NULL)) != -1) {
         switch (ch) {

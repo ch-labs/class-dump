@@ -112,6 +112,7 @@
 		01B02D2D13A5B57E0047BC53 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 013D1F0B13A5ADC300BF0A67 /* libcrypto.dylib */; };
 		01B02D3A13A5B72B0047BC53 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 013D1F0B13A5ADC300BF0A67 /* libcrypto.dylib */; };
 		01EB826413A590D9003EDE60 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01EB826313A590D9003EDE60 /* Foundation.framework */; };
+		DA28274314E7E39B0017C682 /* CDDotVisitor.m in Sources */ = {isa = PBXBuildFile; fileRef = DA28274214E7E39B0017C682 /* CDDotVisitor.m */; };
 		DA7533B213AA587A003BE32C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01EB826313A590D9003EDE60 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -363,6 +364,8 @@
 		01EB831F13A591D8003EDE60 /* CDVisitorPropertyState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDVisitorPropertyState.h; path = Source/CDVisitorPropertyState.h; sourceTree = SOURCE_ROOT; };
 		01EB832013A591D8003EDE60 /* CDVisitorPropertyState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDVisitorPropertyState.m; path = Source/CDVisitorPropertyState.m; sourceTree = SOURCE_ROOT; };
 		01EB836813A5933F003EDE60 /* dyld-info-compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "dyld-info-compat.h"; path = "Source/dyld-info-compat.h"; sourceTree = SOURCE_ROOT; };
+		DA28274114E7E39B0017C682 /* CDDotVisitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDDotVisitor.h; path = Source/CDDotVisitor.h; sourceTree = "<group>"; };
+		DA28274214E7E39B0017C682 /* CDDotVisitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDDotVisitor.m; path = Source/CDDotVisitor.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -433,6 +436,8 @@
 				01EB829E13A591D7003EDE60 /* CDClassFrameworkVisitor.m */,
 				01EB82E113A591D8003EDE60 /* CDMultiFileVisitor.h */,
 				01EB82E213A591D8003EDE60 /* CDMultiFileVisitor.m */,
+				DA28274114E7E39B0017C682 /* CDDotVisitor.h */,
+				DA28274214E7E39B0017C682 /* CDDotVisitor.m */,
 				01EB830B13A591D8003EDE60 /* CDTextClassDumpVisitor.h */,
 				01EB830C13A591D8003EDE60 /* CDTextClassDumpVisitor.m */,
 			);
@@ -912,6 +917,7 @@
 				01B02D2A13A5B4D70047BC53 /* CDTextClassDumpVisitor.m in Sources */,
 				01B02D2B13A5B4D70047BC53 /* CDSearchPathState.m in Sources */,
 				01B02D1113A5B1460047BC53 /* class-dump.m in Sources */,
+				DA28274314E7E39B0017C682 /* CDDotVisitor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
