@@ -124,8 +124,7 @@ NSString *CDErrorKey_Exception    = @"CDErrorKey_Exception";
             NSString *failureReason;
             NSString *targetArchName = CDNameForCPUType(_targetArch.cputype, _targetArch.cpusubtype);
             if ([file isKindOfClass:[CDFatFile class]] && [(CDFatFile *)file containsArchitecture:_targetArch]) {
-                failureReason = [NSString stringWithFormat:@"Fat file doesn't contain a valid Mach-O file for the specified architecture (%@).  "
-                                                            "It probably means that class-dump was run on a static library, which is not supported.", targetArchName];
+                failureReason = [NSString stringWithFormat:@"Fat file doesn't contain a valid Mach-O file for the specified architecture (%@).", targetArchName];
             } else {
                 failureReason = [NSString stringWithFormat:@"File doesn't contain the specified architecture (%@).  Available architectures are %@.", targetArchName, file.architectureNameDescription];
             }

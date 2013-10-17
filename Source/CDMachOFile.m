@@ -8,9 +8,11 @@
 #include <mach-o/arch.h>
 #include <mach-o/loader.h>
 #include <mach-o/fat.h>
+#include <ar.h>
 
 #import "CDMachOFileDataCursor.h"
 #import "CDFatFile.h"
+#import "CDArchive.h"
 #import "CDLoadCommand.h"
 #import "CDLCDyldInfo.h"
 #import "CDLCDylib.h"
@@ -94,7 +96,13 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
         } else if (_magic == MH_CIGAM || _magic == MH_CIGAM_64) {
             _byteOrder = CDByteOrder_LittleEndian;
         } else {
-            return nil;
+            cursor.offset = 0;
+            NSString *magic = [cursor readStringOfLength:SARMAG encoding:NSASCIIStringEncoding];
+            if ([magic isEqualToString:@(ARMAG)]) {
+                return [CDArchive machOFileWithArchiveData:data filename:filename error:NULL];
+            } else {
+                return nil;
+            }
         }
         
         _uses64BitABI = (_magic == MH_MAGIC_64) || (_magic == MH_CIGAM_64);

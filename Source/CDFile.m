@@ -133,8 +133,8 @@ BOOL CDArchUses64BitLibraries(CDArch arch)
 - (id)initWithData:(NSData *)data filename:(NSString *)filename searchPathState:(CDSearchPathState *)searchPathState;
 {
     if ((self = [super init])) {
-        // Otherwise reading the magic number fails.
-        if ([data length] < 4) {
+        // Otherwise reading the magic number or archive header fails.
+        if ([data length] < 8) {
             return nil;
         }
         
