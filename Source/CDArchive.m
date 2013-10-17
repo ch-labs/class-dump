@@ -129,14 +129,14 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
     NSTask *clang = [[NSTask alloc] init];
     clang.launchPath = @"/usr/bin/xcrun";
     NSMutableArray *arguments = [@[ @"clang",
-                                 @"-arch", arch,
-                                 @"-x", @"c",
-                                 @"-o", @"/dev/stdout",
-                                 @"-ObjC",
-                                 @"-flat_namespace",
-                                 @"-undefined", @"suppress",
-                                 @"-isysroot", sdkURL.path,
-                                 ] mutableCopy];
+                                    @"-arch", arch,
+                                    @"-x", @"c",
+                                    @"-o", @"/dev/stdout",
+                                    @"-ObjC",
+                                    @"-flat_namespace",
+                                    @"-undefined", @"suppress",
+                                    @"-isysroot", sdkURL.path,
+                                  ] mutableCopy];
     
     if ([platform isEqualToString:@"MacOSX"]) {
         [arguments addObject:[@"-mmacosx-version-min=" stringByAppendingString:sdkVersion]];
