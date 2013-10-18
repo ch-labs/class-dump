@@ -39,6 +39,43 @@ static NSString *DeveloperDirectoryPath(NSError *__autoreleasing * error)
     return developerDirectoryPath;
 }
 
+static NSString *PlatformWithMachOFile(CDMachOFile *machOFile)
+{
+    if (machOFile.maskedCPUType == CPU_TYPE_ARM) {
+        // This arm => iPhoneOS assumption may break in the future
+        return @"iPhoneOS";
+    }
+    
+    CDSection *objcImageInfoSection = nil;
+    for (CDLCSegment *segment in machOFile.loadCommands) {
+        if ([segment isKindOfClass:[CDLCSegment class]]) {
+            for (CDSection *section in segment.sections) {
+                if ([section.segmentName isEqualToString:@"__DATA" ] && [section.sectionName isEqualToString:@"__objc_imageinfo"]) {
+                    objcImageInfoSection = section;
+                    break;
+                }
+            }
+        }
+        if (objcImageInfoSection) {
+            break;
+        }
+    }
+    
+    if (machOFile.cputype == CPU_TYPE_I386 && objcImageInfoSection)
+        return @"iPhoneSimulator";
+    
+    CDMachOFileDataCursor *imageInfoCursor = [[CDMachOFileDataCursor alloc] initWithSection:objcImageInfoSection];
+    if (imageInfoCursor.remaining >= 8) {
+        [imageInfoCursor readInt32]; // version
+        uint32_t flags = [imageInfoCursor readInt32];
+        if (flags & (1<<5)) { // gparker: @0xced Sufficiently new tools set a bit in __DATA,__objc_imageinfo for simulator-built binaries. [http://twitter.com/gparker/status/390612463101546496]
+            return @"iPhoneSimulator";
+        }
+    }
+    
+    return @"MacOSX";
+}
+
 static NSString *ArchiveFileName(struct ar_hdr *header)
 {
     NSData *data = [NSData dataWithBytes:header->ar_name length:sizeof(header->ar_name)];
@@ -59,7 +96,7 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
         return nil;
     
     NSString *arch = nil;
-    NSString *platform = @"MacOSX";
+    NSString *platform = nil;
     
     struct ar_hdr *header = NULL;
     while (cursor.remaining > sizeof(*header)) {
@@ -81,45 +118,11 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
         CDMachOFile *machOFile = [[CDMachOFile alloc] initWithData:machOData filename:[filename stringByAppendingFormat:@"(%@)", fileName] searchPathState:nil];
         if (machOFile) {
             arch = CDNameForCPUType(machOFile.cputype, machOFile.cpusubtype);
-            if (machOFile.maskedCPUType == CPU_TYPE_ARM) {
-                // This arm => iPhoneOS assumption may break in the future
-                platform = @"iPhoneOS";
-            }
-            
-            CDSection *objcImageInfoSection = nil;
-            for (CDLCSegment *segment in machOFile.loadCommands) {
-                if ([segment isKindOfClass:[CDLCSegment class]]) {
-                    for (CDSection *section in segment.sections) {
-                        if ([section.segmentName isEqualToString:@"__DATA" ] && [section.sectionName isEqualToString:@"__objc_imageinfo"]) {
-                            objcImageInfoSection = section;
-                            break;
-                        }
-                    }
-                }
-                if (objcImageInfoSection) {
-                    break;
-                }
-            }
-            
-            if ([arch isEqualToString:@"i386"] && objcImageInfoSection)
-                platform = @"iPhoneSimulator";
-            
-            CDMachOFileDataCursor *imageInfoCursor = [[CDMachOFileDataCursor alloc] initWithSection:objcImageInfoSection];
-            if (imageInfoCursor.remaining >= 8) {
-                [imageInfoCursor readInt32]; // version
-                uint32_t flags = [imageInfoCursor readInt32];
-                if (flags & (1<<5)) { // gparker: @0xced Sufficiently new tools set a bit in __DATA,__objc_imageinfo for simulator-built binaries. [http://twitter.com/gparker/status/390612463101546496]
-                    platform = @"iPhoneSimulator";
-                }
-            }
-            
+            platform = PlatformWithMachOFile(machOFile);
             break;
         }
         cursor.offset += size;
     }
-    
-    if (!arch)
-        return nil;
     
     NSString *developerDirectoryPath = DeveloperDirectoryPath(error);
     if (!developerDirectoryPath)
