@@ -80,7 +80,6 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
         NSData *machOData = [NSData dataWithBytesNoCopy:(void *)((NSUInteger)cursor.bytes + cursor.offset) length:size freeWhenDone:NO];
         CDMachOFile *machOFile = [[CDMachOFile alloc] initWithData:machOData filename:[filename stringByAppendingFormat:@"(%@)", fileName] searchPathState:nil];
         if (machOFile) {
-            [machOFile hasObjectiveC2Data];
             arch = CDNameForCPUType(machOFile.cputype, machOFile.cpusubtype);
             if (machOFile.maskedCPUType == CPU_TYPE_ARM) {
                 // This arm => iPhoneOS assumption may break in the future
