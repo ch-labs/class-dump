@@ -14,6 +14,31 @@
 
 @implementation CDArchive
 
+static NSString *DeveloperDirectoryPath(NSError *__autoreleasing * error)
+{
+    NSString *developerDirectoryPath = nil;
+    
+    @try {
+        NSTask *xcode_select = [[NSTask alloc] init];
+        xcode_select.launchPath = @"/usr/bin/xcode-select";
+        xcode_select.arguments = @[ @"-print-path" ];
+        xcode_select.standardOutput = [NSPipe pipe];
+        [xcode_select launch];
+        [xcode_select waitUntilExit];
+        NSData *developerDirData = [[xcode_select.standardOutput fileHandleForReading] readDataToEndOfFile];
+        developerDirectoryPath = [[NSString alloc] initWithData:developerDirData encoding:NSUTF8StringEncoding];
+        developerDirectoryPath = [developerDirectoryPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
+    @catch (NSException * __unused exception) {
+        developerDirectoryPath = nil;
+        if (error) {
+            *error = [NSError errorWithDomain:nil code:0 userInfo:nil]; // TODO: real error
+        }
+    }
+    
+    return developerDirectoryPath;
+}
+
 static NSString *ArchiveFileName(struct ar_hdr *header)
 {
     NSData *data = [NSData dataWithBytes:header->ar_name length:sizeof(header->ar_name)];
@@ -97,26 +122,11 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
     if (!arch)
         return nil;
     
-    NSString *developerDir = nil;
-	@try {
-		NSTask *xcode_select = [[NSTask alloc] init];
-		xcode_select.launchPath = @"/usr/bin/xcode-select";
-		xcode_select.arguments = @[ @"-print-path" ];
-		xcode_select.standardOutput = [NSPipe pipe];
-		[xcode_select launch];
-		[xcode_select waitUntilExit];
-		NSData *developerDirData = [[xcode_select.standardOutput fileHandleForReading] readDataToEndOfFile];
-		developerDir = [[NSString alloc] initWithData:developerDirData encoding:NSUTF8StringEncoding];
-		developerDir = [developerDir stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	}
-	@catch (NSException * __unused exception) {
-        developerDir = nil;
-    }
-    
-    if (!developerDir)
+    NSString *developerDirectoryPath = DeveloperDirectoryPath(error);
+    if (!developerDirectoryPath)
         return nil;
     
-    NSString *sdksDir = [NSString stringWithFormat:@"%@/Platforms/%@.platform/Developer/SDKs/", developerDir, platform];
+    NSString *sdksDir = [NSString stringWithFormat:@"%@/Platforms/%@.platform/Developer/SDKs/", developerDirectoryPath, platform];
     NSArray *sdkURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[NSURL fileURLWithPath:sdksDir] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:NULL];
     NSURL *sdkURL = [[sdkURLs sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
         return [url1.lastPathComponent compare:url2.lastPathComponent];
