@@ -73,7 +73,7 @@ static NSTask *ClangTask(NSString *sdkRoot, NSString *sdkVersion, NSString *arch
         [arguments addObject:[@"-mios-simulator-version-min=" stringByAppendingString:sdkVersion]];
     }
     
-    NSString *searchPath = [@"-L" stringByAppendingString:[filename stringByDeletingLastPathComponent]];
+    NSString *searchPath = [filename stringByDeletingLastPathComponent];
     NSString *libName = [[filename lastPathComponent] stringByDeletingPathExtension];
     if ([libName hasPrefix:@"lib"])
         libName = [libName substringFromIndex:3];
@@ -81,11 +81,14 @@ static NSTask *ClangTask(NSString *sdkRoot, NSString *sdkVersion, NSString *arch
     
     NSRange frameworkExtensionRange = [filename rangeOfString:@".framework"];
     if (frameworkExtensionRange.location != NSNotFound) {
-        searchPath = [@"-F" stringByAppendingString:[[filename substringToIndex:frameworkExtensionRange.location] stringByDeletingLastPathComponent]];
+        searchPath = [[filename substringToIndex:frameworkExtensionRange.location] stringByDeletingLastPathComponent];
         linkOption = @[ @"-framework", [filename lastPathComponent] ];
     }
     
-    [arguments addObject:searchPath];
+    if (searchPath.length == 0)
+        searchPath = @".";
+    
+    [arguments addObject:[[linkOption[0] isEqualToString:@"-l"] ? @"-L" : @"-F" stringByAppendingString:searchPath]];
     [arguments addObjectsFromArray:linkOption];
     [arguments addObject:@"-"];
     clang.arguments = arguments;
