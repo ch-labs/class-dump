@@ -18,6 +18,7 @@
 #import "CDLCDylib.h"
 #import "CDLCDynamicSymbolTable.h"
 #import "CDLCEncryptionInfo.h"
+#import "CDLCLinkerOption.h"
 #import "CDLCRunPath.h"
 #import "CDLCSegment.h"
 #import "CDLCSymbolTable.h"
@@ -61,6 +62,7 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
     NSArray *_runPathCommands;
     NSArray *_dyldEnvironment;
     NSArray *_reExportedDylibs;
+    NSArray *_linkerOptions;
 
     // The parts of struct mach_header_64 pulled out so that our property accessors can be synthesized.
 	uint32_t _magic;
@@ -148,6 +150,7 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
     NSMutableArray *runPathCommands   = [[NSMutableArray alloc] init];
     NSMutableArray *dyldEnvironment   = [[NSMutableArray alloc] init];
     NSMutableArray *reExportedDylibs  = [[NSMutableArray alloc] init];
+    NSMutableArray *linkerOptions     = [[NSMutableArray alloc] init];
     
     for (uint32_t index = 0; index < count; index++) {
         CDLoadCommand *loadCommand = [CDLoadCommand loadCommandWithDataCursor:cursor];
@@ -166,6 +169,7 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
             else if ([loadCommand isKindOfClass:[CDLCSymbolTable class]])        self.symbolTable = (CDLCSymbolTable *)loadCommand;
             else if ([loadCommand isKindOfClass:[CDLCDynamicSymbolTable class]]) self.dynamicSymbolTable = (CDLCDynamicSymbolTable *)loadCommand;
             else if ([loadCommand isKindOfClass:[CDLCDyldInfo class]])           self.dyldInfo = (CDLCDyldInfo *)loadCommand;
+            else if ([loadCommand isKindOfClass:[CDLCLinkerOption class]])       [linkerOptions addObjectsFromArray:((CDLCLinkerOption *)loadCommand).linkerOption];
             else if ([loadCommand isKindOfClass:[CDLCRunPath class]]) {
                 [runPaths addObject:[(CDLCRunPath *)loadCommand resolvedRunPath]];
                 [runPathCommands addObject:loadCommand];
@@ -180,6 +184,7 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
     _runPathCommands   = [runPathCommands copy];
     _dyldEnvironment   = [dyldEnvironment copy];
     _reExportedDylibs  = [reExportedDylibs copy];
+    _linkerOptions     = linkerOptions.count ? [linkerOptions copy] : nil;
 
     for (CDLoadCommand *loadCommand in _loadCommands) {
         [loadCommand machOFileDidReadLoadCommands:self];

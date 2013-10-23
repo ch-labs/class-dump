@@ -12,6 +12,7 @@
 #import "CDLCEncryptionInfo.h"
 #import "CDLCFunctionStarts.h"
 #import "CDLCLinkeditData.h"
+#import "CDLCLinkerOption.h"
 #import "CDLCPrebindChecksum.h"
 #import "CDLCPreboundDylib.h"
 #import "CDLCRoutines32.h"
@@ -93,6 +94,7 @@
         case LC_DATA_IN_CODE:          targetClass = [CDLCDataInCode class]; break;
         case LC_SOURCE_VERSION:        targetClass = [CDLCSourceVersion class]; break;
         case LC_DYLIB_CODE_SIGN_DRS:   targetClass = [CDLCLinkeditData class]; break; // Designated Requirements
+        case LC_LINKER_OPTION:         targetClass = [CDLCLinkerOption class]; break;
             
         default:
             NSLog(@"Unknown load command: 0x%08x", val);

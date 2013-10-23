@@ -36,6 +36,7 @@ typedef enum : NSUInteger {
 @property (readonly) NSArray *runPathCommands;
 @property (readonly) NSArray *dyldEnvironment;
 @property (readonly) NSArray *reExportedDylibs;
+@property (readonly) NSArray *linkerOptions; // only used in MH_OBJECT filetypes
 
 @property (strong) CDLCSymbolTable *symbolTable;
 @property (strong) CDLCDynamicSymbolTable *dynamicSymbolTable;
