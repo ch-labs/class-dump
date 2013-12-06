@@ -51,7 +51,7 @@ static NSString *SDKRoot(NSString *developerDirectoryPath, NSString *platform)
     return sdkURL.path;
 }
 
-static NSTask *ClangTask(NSString *sdkRoot, NSString *sdkVersion, NSString *arch, NSString *platform, NSString *filename)
+static NSTask *ClangTask(NSString *sdkRoot, NSString *sdkVersion, NSString *arch, NSString *platform, NSString *objcABIVersion, NSString *filename)
 {
     NSTask *clang = [[NSTask alloc] init];
     clang.launchPath = @"/usr/bin/xcrun";
@@ -62,6 +62,7 @@ static NSTask *ClangTask(NSString *sdkRoot, NSString *sdkVersion, NSString *arch
                                     @"-ObjC",
                                     @"-flat_namespace",
                                     @"-undefined", @"suppress",
+                                    @"-Xlinker", @"-objc_abi_version", @"-Xlinker", objcABIVersion,
                                     @"-isysroot", sdkRoot,
                                     ] mutableCopy];
     
@@ -158,6 +159,7 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
     
     NSString *arch = nil;
     NSString *platform = nil;
+    NSString *objcABIVersion = nil;
     
     struct ar_hdr *header = NULL;
     while (cursor.remaining > sizeof(*header)) {
@@ -180,6 +182,7 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
         if (machOFile) {
             arch = CDNameForCPUType(machOFile.cputype, machOFile.cpusubtype);
             platform = PlatformWithMachOFile(machOFile);
+            objcABIVersion = machOFile.hasObjectiveC2Data ? @"2" : @"1";
             break;
         }
         cursor.offset += size;
@@ -194,7 +197,7 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
         return nil;
     
     NSString *sdkVersion = [sdkName substringFromIndex:platform.length];
-    NSTask *clang = ClangTask(sdkRoot, sdkVersion, arch, platform, filename);
+    NSTask *clang = ClangTask(sdkRoot, sdkVersion, arch, platform, objcABIVersion, filename);
     NSData *machOData = nil;
     @try {
         [clang launch];
