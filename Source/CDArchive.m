@@ -14,6 +14,8 @@
 
 @implementation CDArchive
 
+#pragma mark - Developer Tools
+
 static NSString *DeveloperDirectoryPath(NSError *__autoreleasing * error)
 {
     NSString *developerDirectoryPath = nil;
@@ -38,6 +40,18 @@ static NSString *DeveloperDirectoryPath(NSError *__autoreleasing * error)
     
     return developerDirectoryPath;
 }
+
+static NSString *SDKRoot(NSString *developerDirectoryPath, NSString *platform)
+{
+    NSString *sdksDir = [NSString stringWithFormat:@"%@/Platforms/%@.platform/Developer/SDKs/", developerDirectoryPath, platform];
+    NSArray *sdkURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[NSURL fileURLWithPath:sdksDir] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:NULL];
+    NSURL *sdkURL = [[sdkURLs sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
+        return [url1.lastPathComponent compare:url2.lastPathComponent];
+    }] lastObject];
+    return sdkURL.path;
+}
+
+#pragma mark - Archive
 
 static NSString *PlatformWithMachOFile(CDMachOFile *machOFile)
 {
@@ -127,13 +141,8 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
     NSString *developerDirectoryPath = DeveloperDirectoryPath(error);
     if (!developerDirectoryPath)
         return nil;
-    
-    NSString *sdksDir = [NSString stringWithFormat:@"%@/Platforms/%@.platform/Developer/SDKs/", developerDirectoryPath, platform];
-    NSArray *sdkURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[NSURL fileURLWithPath:sdksDir] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:NULL];
-    NSURL *sdkURL = [[sdkURLs sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
-        return [url1.lastPathComponent compare:url2.lastPathComponent];
-    }] lastObject];
-    NSString *sdkName = [sdkURL.lastPathComponent stringByDeletingPathExtension];
+    NSString *sdkRoot = SDKRoot(developerDirectoryPath, platform);
+    NSString *sdkName = [sdkRoot.lastPathComponent stringByDeletingPathExtension];
     if (![sdkName hasPrefix:platform])
         return nil;
     
@@ -147,7 +156,7 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
                                     @"-ObjC",
                                     @"-flat_namespace",
                                     @"-undefined", @"suppress",
-                                    @"-isysroot", sdkURL.path,
+                                    @"-isysroot", sdkRoot,
                                   ] mutableCopy];
     
     if ([platform isEqualToString:@"MacOSX"]) {
