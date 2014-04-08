@@ -51,6 +51,50 @@ static NSString *SDKRoot(NSString *developerDirectoryPath, NSString *platform)
     return sdkURL.path;
 }
 
+static NSTask *ClangTask(NSString *sdkRoot, NSString *sdkVersion, NSString *arch, NSString *platform, NSString *filename)
+{
+    NSTask *clang = [[NSTask alloc] init];
+    clang.launchPath = @"/usr/bin/xcrun";
+    NSMutableArray *arguments = [@[ @"clang",
+                                    @"-arch", arch,
+                                    @"-x", @"c",
+                                    @"-o", @"/dev/stdout",
+                                    @"-ObjC",
+                                    @"-flat_namespace",
+                                    @"-undefined", @"suppress",
+                                    @"-isysroot", sdkRoot,
+                                    ] mutableCopy];
+    
+    if ([platform isEqualToString:@"MacOSX"]) {
+        [arguments addObject:[@"-mmacosx-version-min=" stringByAppendingString:sdkVersion]];
+    } else if ([platform isEqualToString:@"iPhoneOS"]) {
+        [arguments addObject:[@"-miphoneos-version-min=" stringByAppendingString:sdkVersion]];
+    } else if ([platform isEqualToString:@"iPhoneSimulator"]) {
+        [arguments addObject:[@"-mios-simulator-version-min=" stringByAppendingString:sdkVersion]];
+    }
+    
+    NSString *searchPath = [@"-L" stringByAppendingString:[filename stringByDeletingLastPathComponent]];
+    NSString *libName = [[filename lastPathComponent] stringByDeletingPathExtension];
+    if ([libName hasPrefix:@"lib"])
+        libName = [libName substringFromIndex:3];
+    NSArray *linkOption = @[ @"-l", libName ];
+    
+    NSRange frameworkExtensionRange = [filename rangeOfString:@".framework"];
+    if (frameworkExtensionRange.location != NSNotFound) {
+        searchPath = [@"-F" stringByAppendingString:[[filename substringToIndex:frameworkExtensionRange.location] stringByDeletingLastPathComponent]];
+        linkOption = @[ @"-framework", [filename lastPathComponent] ];
+    }
+    
+    [arguments addObject:searchPath];
+    [arguments addObjectsFromArray:linkOption];
+    [arguments addObject:@"-"];
+    clang.arguments = arguments;
+    clang.standardInput = [NSPipe pipe];
+    clang.standardOutput = [NSPipe pipe];
+    clang.standardError = [NSFileHandle fileHandleWithNullDevice];
+    return clang;
+}
+
 #pragma mark - Archive
 
 static NSString *PlatformWithMachOFile(CDMachOFile *machOFile)
@@ -147,45 +191,7 @@ static NSUInteger ArchiveFileSize(struct ar_hdr *header)
         return nil;
     
     NSString *sdkVersion = [sdkName substringFromIndex:platform.length];
-    NSTask *clang = [[NSTask alloc] init];
-    clang.launchPath = @"/usr/bin/xcrun";
-    NSMutableArray *arguments = [@[ @"clang",
-                                    @"-arch", arch,
-                                    @"-x", @"c",
-                                    @"-o", @"/dev/stdout",
-                                    @"-ObjC",
-                                    @"-flat_namespace",
-                                    @"-undefined", @"suppress",
-                                    @"-isysroot", sdkRoot,
-                                  ] mutableCopy];
-    
-    if ([platform isEqualToString:@"MacOSX"]) {
-        [arguments addObject:[@"-mmacosx-version-min=" stringByAppendingString:sdkVersion]];
-    } else if ([platform isEqualToString:@"iPhoneOS"]) {
-        [arguments addObject:[@"-miphoneos-version-min=" stringByAppendingString:sdkVersion]];
-    } else if ([platform isEqualToString:@"iPhoneSimulator"]) {
-        [arguments addObject:[@"-mios-simulator-version-min=" stringByAppendingString:sdkVersion]];
-    }
-    
-    NSString *searchPath = [@"-L" stringByAppendingString:[filename stringByDeletingLastPathComponent]];
-    NSString *libName = [[filename lastPathComponent] stringByDeletingPathExtension];
-    if ([libName hasPrefix:@"lib"])
-        libName = [libName substringFromIndex:3];
-    NSArray *linkOption = @[ @"-l", libName ];
-    
-    NSRange frameworkExtensionRange = [filename rangeOfString:@".framework"];
-    if (frameworkExtensionRange.location != NSNotFound) {
-        searchPath = [@"-F" stringByAppendingString:[[filename substringToIndex:frameworkExtensionRange.location] stringByDeletingLastPathComponent]];
-        linkOption = @[ @"-framework", [filename lastPathComponent] ];
-    }
-    
-    [arguments addObject:searchPath];
-    [arguments addObjectsFromArray:linkOption];
-    [arguments addObject:@"-"];
-    clang.arguments = arguments;
-    clang.standardInput = [NSPipe pipe];
-    clang.standardOutput = [NSPipe pipe];
-    clang.standardError = [NSFileHandle fileHandleWithNullDevice];
+    NSTask *clang = ClangTask(sdkRoot, sdkVersion, arch, platform, filename);
     NSData *machOData = nil;
     @try {
         [clang launch];
