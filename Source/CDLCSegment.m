@@ -7,8 +7,8 @@
 
 #import "CDMachOFile.h"
 #import "CDSection.h"
-#include <openssl/aes.h>
-#include <openssl/blowfish.h>
+#include "aes.h"
+#include "blowfish.h"
 
 NSString *CDSegmentEncryptionTypeName(CDSegmentEncryptionType type)
 {

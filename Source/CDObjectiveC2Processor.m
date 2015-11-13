@@ -254,10 +254,10 @@
         NSString *moduleName; // TODO: (2014-06-03) Do something with the module name?
         [scanner scanInteger:&length];
         [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&moduleName];
-        NSParameterAssert(moduleName.length == length);
+        //NSParameterAssert(moduleName.length == length);
         [scanner scanInteger:&length];
         [scanner scanUpToCharactersFromSet:[NSCharacterSet new] intoString:&className];
-        NSParameterAssert(className.length == length);
+        //NSParameterAssert(className.length == length);
     }
     
     CDOCClass *aClass = [[CDOCClass alloc] initWithName:className];
